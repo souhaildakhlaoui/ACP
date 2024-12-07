@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "g2ROGsCQ/MDK3UBkT8b4sKmX+UGxG5UiZCFpqq1FKX4=",
+  "Source": "RuleEngineService",
+  "BasePath": "_content/RuleEngineService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
