@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular-front-end
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: angular-front-end
+  template:
+    metadata:
+      labels:
+        app: angular-front-end
+    spec:
+      containers:
+      - name: angular-front-end
+        image: sdakhh/angular-front-end:latest
+        ports:
+        - containerPort: 80

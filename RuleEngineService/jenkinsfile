@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE_REPO = "sdakhh"
+        DOCKER_IMAGE_TAG = "latest"
+        K8S_NAMESPACE = "default" 
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout your code from the repository
+                git 'https://github.com/souhaildakhlaoui/ACP'  // Replace with your repo URL
+            }
+        }
+        
+        stage('Build Backend and Frontend Docker Images') {
+            parallel {
+                stage('Build .NET Microservices') {
+                    steps {
+                        script {
+                            // Build .NET Core Microservices Docker Image
+                            sh 'docker build -t $sdakhh/configuration-service:$latest ./ConfigurationService'
+                            sh 'docker build -t $sdakhh/action-service:$latest ./ActionService'
+                            sh 'docker build -t $sdakhh/evaluation-service:$latest ./EvaluationService'
+                            sh 'docker build -t $sdakhh/ruleengine-service:$latest ./RuleEngineService'
+                        }
+                    }
+                }
+
+                stage('Build Angular Frontend') {
+                    steps {
+                        script {
+                            // Build Angular Frontend Docker Image
+                            sh 'docker build -t $sdakhh/angular-frontend:$latest ./AngularFrontEnd'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Images to Docker Hub') {
+    steps {
+        script {
+            // Login to Docker Hub
+            withCredentials([usernamePassword(credentialsId: 'docker-hub-cred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                sh "echo $DOCKER_PASSWORD | docker login -u sdakhh --password-stdin"
+            }
+
+                    // Push all images to Docker Hub
+                    sh 'docker push $sdakhh/configuration-service:$latest'
+                    sh 'docker push $sdakhh/action-service:$latest'
+                    sh 'docker push $sdakhh/evaluation-service:$latest'
+                    sh 'docker push $sdakhh/ruleengine-service:$latest'
+                    sh 'docker push $sdakhh/angular-frontend:$latest'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Deploy to Kubernetes cluster
+                    sh 'kubectl set image deployment/configuration-service configuration-service=$sdakhh/configuration-service:$latest -n ${K8S_NAMESPACE}'
+                    sh 'kubectl set image deployment/action-service action-service=$sdakhh/action-service:$latest -n ${K8S_NAMESPACE}'
+                    sh 'kubectl set image deployment/evaluation-service evaluation-service=$sdakhh/evaluation-service:$latest -n ${K8S_NAMESPACE}'
+                    sh 'kubectl set image deployment/ruleengine-service ruleengine-service=$sdakhh/ruleengine-service:$latest -n ${K8S_NAMESPACE}'
+                    sh 'kubectl set image deployment/angular-front-end angular-front-end=$sdakhh/angular-frontend:$latest -n ${K8S_NAMESPACE}'
+                }
+            }
+        }
+    }
+}

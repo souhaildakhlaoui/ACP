@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruleengine-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruleengine-service
+  template:
+    metadata:
+      labels:
+        app: ruleengine-service
+    spec:
+      containers:
+      - name: ruleengine-service
+        image: sdakhh/ruleengine-service:latest 
+        ports:
+        - containerPort: 80

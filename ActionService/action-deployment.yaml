@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: action-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: action-service
+  template:
+    metadata:
+      labels:
+        app: action-service
+    spec:
+      containers:
+      - name: action-service
+        image: sdakhh/action-service:latest
+        ports:
+        - containerPort: 80
